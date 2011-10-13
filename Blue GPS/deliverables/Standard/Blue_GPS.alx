@@ -4,7 +4,7 @@
 			Blue GPS
 		</name>
 		<description >
-			Turn your Blackberry into fully functional GPS receiver
+			Turn your Blackberry into fully functional Bluetooth GPS receiver.
 		</description>
 		<version >
 			0.1
@@ -15,9 +15,9 @@
 		<copyright >
 			Copyright (c) 2011 Gregory Dymarek
 		</copyright>
-		<fileset Java="1.54" _blackberryVersion="[6.0.0)">
+		<fileset Java="1.54" _blackberryVersion="[5.0.0)">
 			<directory >
-				6.0.0
+				5.0.0
 			</directory>
 			<files >
 				Blue_GPS.cod
