@@ -16,8 +16,10 @@ class LocationTracker {
 	private String lastGPSRead;
 	private BTServer bt;
 	private String log;
+	private DataContext dc;
 	
-	public LocationTracker(BTServer bt) {
+	public LocationTracker(BTServer bt, DataContext dc) {
+		this.dc = dc;
 		this.bt=bt;
 		log = "Starting GPS...";
 		
@@ -42,9 +44,9 @@ class LocationTracker {
 			criteria.setPreferredPowerConsumption(Criteria.POWER_USAGE_MEDIUM);
 			
 			provider = LocationProvider.getInstance(criteria);
-			
+
 			// reset the gps counter so we wait another 5 mins before a reset
-			provider.setLocationListener(new MyLocationListener(), -1, -1, -1);
+			provider.setLocationListener(new MyLocationListener(), this.dc.frequency, -1, -1);
 			//provider.setLocationListener(listener, interval, timeout, maxAge)
 			log = "GPS initialized. Awaiting coordinates...";
 		} catch(Exception e) { }
@@ -53,15 +55,19 @@ class LocationTracker {
 	private class MyLocationListener implements LocationListener {
 		public void locationUpdated(LocationProvider provider, Location location) {
 			SimpleDateFormat timingFormat = new SimpleDateFormat("ddMMyy,HHmmss");
-			lastGPSRead = timingFormat.format(new Date());
+			lastGPSRead = timingFormat.format(new Date()); //hopefully it is UTC? This possibly could be taken from BB NMEA sentence. Though does it have UTC?
 			if(location != null && location.isValid())
 			{				
-				//log = location.getExtraInfo("application/X-jsr179-location-nmea");
-				//location.getQualifiedCoordinates()
-				//log = postprocess(log);
-				BBNmea nmea = new BBNmea(location,lastGPSRead);
-				log = nmea.getGGA() + "\n\r" + nmea.getRMC() + "\n\r" + nmea.getGSV() + "\n\r" + nmea.getGSA() + "\n\r" + nmea.getVTG() + "\n\r";
+				BBNmea nmea = new BBNmea(location,lastGPSRead,dc);
+				log = "";
+				if (dc.gpgga) log += nmea.getGGA();
+				if (dc.gprmc) log += nmea.getRMC();
+				if (dc.gpgll) log += nmea.getGLL();
+				if (dc.gpgsa) log += nmea.getGSA();
+
 				bt.sendData(log);
+				
+				log += "\r\n"+nmea.coordinates.getLatitude()+"\r\n"+nmea.coordinates.getLongitude();
 /*
 				String d =
 					"$GPGGA,203115.438,5555.11516,N,-309.6039,W,1,5,,105.0,M,,M,,0000*5D\n\r"+
@@ -102,15 +108,7 @@ class LocationTracker {
 			// TODO: if provider was disabled, then disable reporting
 			log = "GPS state changed: " + newState;
 			
-			LocationTracker.this.setupGPS();
-			
-//			try {
-//				provider.setLocationListener(null, 0, 0, 0);
-//				provider.reset();
-//				provider = null;
-//				provider = LocationProvider.getInstance(new Criteria());
-//				provider.setLocationListener(new MyLocationListener(), 10, -1, -1);
-//			} catch(Exception e) { log = e.toString() + log; }
+//			LocationTracker.this.setupGPS();
 		}
 	}
 

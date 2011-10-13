@@ -7,18 +7,30 @@ import javax.microedition.location.QualifiedCoordinates;
 
 public class BBNmea {
 	private Location location;
-	private QualifiedCoordinates coordinates;
+	public QualifiedCoordinates coordinates;
 	private String FixTime;
 	private String FixDate;
 	private String latitude;
 	private String longitude;
 	private String altitude;
+	private float hdop;
+	private float vdop;	
+	private float pdop;
+	private DataContext dc;
 	
-	public BBNmea(Location loc, String fixtimestamp) {
+	public BBNmea(Location loc, String fixtimestamp, DataContext dc) {
+		this.dc = dc;
 		location = loc;
 		coordinates = location.getQualifiedCoordinates();
 		FixDate = fixtimestamp.substring(0, 6);
-		FixTime = fixtimestamp.substring(7,13);
+		FixTime = fixtimestamp.substring(7,13)+".000";
+		
+		hdop = coordinates.getHorizontalAccuracy();
+		vdop = coordinates.getVerticalAccuracy();
+		pdop = (float)Math.sqrt(hdop*hdop+vdop*vdop);
+		hdop = m_to_dop(hdop);
+		vdop = m_to_dop(vdop);
+		pdop = m_to_dop(pdop);
 		
 		double _latitude = coordinates.getLatitude(); //N,S
 		if (_latitude<0) latitude = deg_to_dms(Math.abs(_latitude))+",S";
@@ -36,10 +48,14 @@ public class BBNmea {
 	public String getGGA() {
 		String ret = "GPGGA,";
 
-		ret += FixTime+","+latitude+","+longitude+",1,06,1.9,"+altitude+",0.0,M,,0000";
-		//06 satelites
-		//ret += "231315.079,5555.1110,N,00309.5998,W,1,06,1.9,72.9,M,52.2,M,,0000";
-		return "$"+ret+"*"+checksum(ret);		
+		ret += FixTime+","+latitude+","+longitude+",1,00,"+hdop+","+altitude+",0.0,M,,0000";
+
+		if (this.dc.debug) {
+			//ret = "GPGGA,085247.000,1291.7150,N,10134.3113,E,1,04,2.1,94.7,M,8.5,M,,0000";
+			//ret = "GPGGA,125030.31,1234.567890,S,01234.567890,E,1,04,2.1,94.7,M,8.5,M,,0000";
+			ret = "GPGGA,085247.000,1291.7150,N,10134.3113,E,1,00,2.1,94.7,M,8.5,M,,0000";
+		}
+		return "$"+ret+"*"+checksum(ret)+"\r\n";		
 	}
 	
 	public String getGLL() {
@@ -47,53 +63,59 @@ public class BBNmea {
 
 		ret += latitude+","+longitude+","+FixTime+",A";
 
-		return "$"+ret+"*"+checksum(ret);	
+		if (this.dc.debug) {
+			ret = "GPGLL,1291.7150,N,10134.3113,E,085247.000,A";
+		}
+		
+		return "$"+ret+"*"+checksum(ret)+"\r\n";	
 	}
 	
 	public String getRMC() {
 		String ret = "GPRMC,";
 		
 		float speed = location.getSpeed()/(float)0.514;
-		int ispeed = (int)speed*1000;
-		speed = ispeed/1000;
+		int ispeed = (int)(speed*1000.0f);
+		speed = ispeed/1000.0f;
 		
 		float tangle = location.getCourse(); //can be 0.0?
-		int itangle = (int)tangle*1000;
-		tangle = itangle/1000;
-		
-		tangle=0;
+		int itangle = (int)(tangle*1000.0f);
+		tangle = itangle/1000.0f;
 		
 		ret += FixTime+",A,"+latitude+","+longitude+","+speed+","+tangle+","+FixDate+",,,A";
-		//ret += "231315.079,A,5555.1110,N,00309.5998,W,000.0,000.0,011011,,,A";
-		
-		return "$"+ret+"*"+checksum(ret);
+		if (this.dc.debug) {
+			//ret = "GPRMC,085246.000,A,1291.7150,N,10134.3113,E,0.00,58.57,110511,,,A";
+			//ret = "GPRMC,125030.31,V,1234.567890,S,01234.567890,E,,,270110,,,N";
+			ret = "GPRMC,085246.000,A,1291.7150,N,10134.3113,E,0.00,58.57,110511,,,A";			
+		}
+		return "$"+ret+"*"+checksum(ret)+"\r\n";
 	}
 	
 	/* dummy data */
 	public String getGSV() {
 		String ret = "GPGSV,";
 
-		ret += "3,1,12,04,52,207,29,10,72,273,37,13,70,080,33,07,31,157,20";
+		//ret += "3,1,12,04,52,207,29,10,72,273,37,13,70,080,33,07,31,157,20";
 		
-		return "$"+ret+"*"+checksum(ret);
+		return "$"+ret+"*"+checksum(ret)+"\r\n";
 	}
 	
 	/* dummy data */
 	public String getGSA() {
 		String ret = "GPGSA,";
 		
-		ret += "A,3,04,10,13,02,05,23,,,,,,,3.0,1.9,2.3";
+		//ret += "A,3,04,10,13,02,05,23,,,,,,,3.0,1.9,2.3";
+		ret += "A,3,,,,,,,,,,,,,"+pdop+","+hdop+","+vdop;
 		
-		return "$"+ret+"*"+checksum(ret);		
+		return "$"+ret+"*"+checksum(ret)+"\r\n";		
 	}
 
 	/* dummy data */
 	public String getVTG() {
 		String ret = "GPVTG,";
 		
-		ret += "000.0,T,,M,000.0,N,000.0,K,A";
+		//ret += "000.0,T,,M,000.0,N,000.0,K,A";
 
-		return "$"+ret+"*"+checksum(ret);		
+		return "$"+ret+"*"+checksum(ret)+"\r\n";		
 	}
 	
 	private String checksum(String s) {
@@ -119,15 +141,25 @@ public class BBNmea {
 	
 	private String deg_to_dms(double _deg) {
 		int deg = (int)_deg;
-		double _min = (_deg-deg)*60;
-		int min = (int)_min;
-		String smin = Integer.toString(min);
-		if (min<10) smin="0"+min;
-		double _sec = (_min-min)*60;
-		int sec = (int)_sec;
-		String ssec = Integer.toString(sec);
-		if (sec<10) ssec="0"+sec;		
-		return deg+""+smin+"."+ssec;
+		int _min = (int)((_deg-deg)*60.0*1000.0);
+		float min = _min/1000.0f;
+		
+		String sdeg = Integer.toString(deg);
+		while (sdeg.length()<2) sdeg = "0"+sdeg;
+		
+		String smin = Float.toString(min);
+		if (min<10) smin = "0"+smin;
+		if (min<1) smin = "0"+smin;
+
+		return sdeg+smin;
+	}
+	
+	private float m_to_dop(float m) {
+		int _ret;
+		if (m==Float.NaN) return 10.0f;
+		_ret = (int)(m*dc.dopm);
+		if (_ret<10) _ret=10;
+		return _ret/10.0f;
 	}
 	/*
 	private String[] split(String original,String separator) {

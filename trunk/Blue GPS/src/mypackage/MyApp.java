@@ -1,6 +1,7 @@
 package mypackage;
 
 import net.rim.device.api.ui.UiApplication;
+import net.rim.device.api.ui.container.MainScreen;
 
 /**
  * This class extends the UiApplication class, providing a
@@ -8,6 +9,7 @@ import net.rim.device.api.ui.UiApplication;
  */
 public class MyApp extends UiApplication
 {
+	public DataContext dc;
     /**
      * Entry point for application
      * @param args Command line arguments (not used)
@@ -25,9 +27,10 @@ public class MyApp extends UiApplication
      * Creates a new MyApp object
      */
     public MyApp()
-    {        
+    {      
+    	dc = new DataContext();
         // Push a screen onto the UI stack for rendering.
-    	MyScreen ms = new MyScreen();
+    	MainScreen ms = new MyScreen();
         pushScreen(ms);
     }
     
