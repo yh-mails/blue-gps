@@ -5,6 +5,7 @@ import javax.microedition.location.Location;
 import net.rim.device.api.system.ApplicationManager;
 import net.rim.device.api.system.GlobalEventListener;
 import net.rim.device.api.ui.UiApplication;
+import net.rim.device.api.ui.component.Dialog;
 
 /**
  * This class extends the UiApplication class, providing a
@@ -111,7 +112,11 @@ public class MyUIApp extends UiApplication
 				case 13:
 					updateScreen(null,"",null);
 					break;
+				case 100:
+					Dialog.inform((String)object0);
+					break;
 				default:
+					Dialog.inform("Unknown message: "+data0+" "+data1);
 			}
 			
 		}
