@@ -13,6 +13,7 @@ import net.rim.device.api.bluetooth.BluetoothSerialPort;
 import net.rim.device.api.bluetooth.BluetoothSerialPortListener;
 import net.rim.device.api.i18n.SimpleDateFormat;
 import net.rim.device.api.system.Application;
+import net.rim.device.api.system.ApplicationDescriptor;
 import net.rim.device.api.system.ApplicationManager;
 import net.rim.device.api.system.GlobalEventListener;
 
@@ -31,6 +32,12 @@ public class MyService extends Application {
     {      
     	dc = new DataContext();
     	
+    	//check if app has been upgraded
+    	if (!ApplicationDescriptor.currentApplicationDescriptor().getVersion().equalsIgnoreCase(dc.ver)) {
+    		dc.upgradeReset();
+    		dc.load();
+    	}
+    		
     	if (!dc.enabled) {
         	dc.serviceProcessID = 0;
         	dc.writeServiceID();    		
