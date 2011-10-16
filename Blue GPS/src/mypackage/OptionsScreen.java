@@ -82,6 +82,7 @@ public final class OptionsScreen extends MainScreen
         gpgsaf.setChangeListener(mfcl);
         updatefreqf.setChangeListener(mfcl);
         dopmf.setChangeListener(mfcl);
+        btservicenamef.setChangeListener(mfcl);
         debugf.setChangeListener(mfcl);
 
         this.add(enabledf);
