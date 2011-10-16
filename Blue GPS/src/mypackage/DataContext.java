@@ -2,6 +2,7 @@ package mypackage;
 
 import java.util.Hashtable;
 
+import net.rim.device.api.system.ApplicationDescriptor;
 import net.rim.device.api.system.ApplicationManager;
 import net.rim.device.api.system.PersistentObject;
 import net.rim.device.api.system.PersistentStore;
@@ -24,6 +25,7 @@ public class DataContext {
 	public int serviceProcessID;
 	public int guiProcessID=0; //0 - no GUI process connected
 	
+	public String ver;
 	public long GUID=0x17293a46212aae03L;
 	
 	public DataContext() {
@@ -41,9 +43,27 @@ public class DataContext {
         
 	}
 	
+	public void upgradeReset() {
+		settingsTable.put("enabled","TRUE");
+		settingsTable.put("GPRMC","TRUE");
+		settingsTable.put("GPGLL","TRUE");
+		settingsTable.put("GPGGA","TRUE");
+		settingsTable.put("GPGSA","TRUE");
+		settingsTable.put("updateFreq","1");
+		settingsTable.put("DOPM","3.0");
+		settingsTable.put("btServiceName","Bluetooth Serial Port");
+		settingsTable.put("debug","0");
+    	settingsTable.put("version", ApplicationDescriptor.currentApplicationDescriptor().getVersion());
+	}
+	
 	public void load() {
+		
         String _s = (String)settingsTable.get("serviceProcessID");
         serviceProcessID = str2int(_s,0);
+
+        _s = (String)settingsTable.get("version");
+        if (_s!=null && _s.length()>0) ver = _s;
+        else ver = new String("0.0");
         
         _s = (String)settingsTable.get("enabled");
         enabled = str2bool(_s,true);
@@ -104,11 +124,12 @@ public class DataContext {
     		settingsTable.put("GPRMC", bool2str(gprmc));
     		severirty = 1;
     	}
+  
+		persistentObject.commit();
+		
 		if (severirty==2) {
-			persistentObject.commit();
 			Dialog.inform("Options saved.\r\nIn order to apply changes please restart your Blackberry.");
 		} else if (severirty==1) {
-			persistentObject.commit();
         	ApplicationManager.getApplicationManager().postGlobalEvent(serviceProcessID, GUID, 2, 0, null, null);
 			Dialog.inform("Options have been applied.\r\n");
 		}

@@ -44,7 +44,7 @@ public final class OptionsScreen extends MainScreen
         setTitle("Blue GPS - Options");
         setBackground(BackgroundFactory.createSolidBackground(0));
         
-        MenuBack = new AppMenu("Back", 0x230000, 0,10,this);    
+        MenuBack = new AppMenu("Back", 0x230000, 1,10,this);    
         addMenuItem(MenuBack);
         
         MyFieldChangeListener mfcl = new MyFieldChangeListener();
