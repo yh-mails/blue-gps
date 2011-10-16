@@ -120,10 +120,12 @@ public class DataContext {
     }
     
     private boolean valueChanged(String key, String val) {
-    	Object o = settingsTable.get(key);
-    	String v;
-    	if (o==null) v=new String();
-    	else v = o.toString();
+    	//we will be comparing v (derived from key) against val
+    	String v = (String)settingsTable.get(key);
+	
+    	if (v==null) v=new String();
+    	if (val==null) val=new String();
+    	
     	if (v.equalsIgnoreCase(val)) //inner value check
     		return false;
     	return true;
