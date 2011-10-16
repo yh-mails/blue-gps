@@ -230,6 +230,7 @@ public class MyService extends Application {
 			11 - hello from service (sent after gui connects to it)
 			12 - reset service
 			13 - gps stopped
+			100 - msg from service
     	 */
 		public void eventOccurred(long guid, int data0, int data1,
 				Object object0, Object object1) {
