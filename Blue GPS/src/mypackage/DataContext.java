@@ -61,7 +61,7 @@ public class DataContext {
         dopm = str2float(_s,3.0f);
         _s = (String)settingsTable.get("btServiceName");
         if (_s!=null && _s.length()>0) btservicename = _s;
-        else btservicename = new String("GPS");
+        else btservicename = new String("Bluetooth Serial Port");
         _s = (String)settingsTable.get("debug");          
         debug = str2int(_s,0);		
 	}

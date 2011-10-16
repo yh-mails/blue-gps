@@ -25,7 +25,7 @@ public class AppMenu extends MenuItem {
     		UiApplication.getUiApplication().pushScreen(hscreen);
     	break;
     	case 3: 
-    		Dialog.inform("Gregory Dymarek\r\n\r\ngregd72002@gmail.com\r\n\r\n15th October 2011");
+    		Dialog.inform("Gregory Dymarek\r\n\r\ngregd72002@gmail.com\r\n\r\n16th October 2011");
     	break;
     	case 4: 
     		if (((MyUIApp)UiApplication.getUiApplication()).dc.serviceProcessID!=0) {

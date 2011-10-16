@@ -65,7 +65,7 @@ public final class OptionsScreen extends MainScreen
         dopmf.setLabel("DOP modifier: ");
         dopmf.setText(Float.toString(app.dc.dopm));        
 
-        LabelField lf2 = new LabelField("\r\n\r\nBluetooth Serial Port Name to create and use for the purpose of the application (default: GPS).\r\n");
+        LabelField lf2 = new LabelField("\r\n\r\nBluetooth Serial Port Name to create and use for the purpose of the application (default: Bluetooth Serial Port).\r\n");
         btservicenamef = new TextField();
         btservicenamef.setLabel("Serial Port Name: ");
         btservicenamef.setText(app.dc.btservicename);
