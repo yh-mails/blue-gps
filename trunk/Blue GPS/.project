@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Blue GPS</name>
+	<name>Blue GPS1</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -26,11 +26,4 @@
 		<nature>net.rim.ejde.BlackBerryProjectCoreNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>res/Blue GPS.png</name>
-			<type>1</type>
-			<location>C:/Users/Administrator/Downloads/Blue GPS.png</location>
-		</link>
-	</linkedResources>
 </projectDescription>
